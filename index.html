@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virtual Aquarium</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #0099ff, #003366);
+    }
+    .aquarium {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .fish {
+      position: absolute;
+      width: 80px;
+      animation: swim 6s linear infinite;
+      cursor: pointer;
+    }
+    @keyframes swim {
+      from {
+        transform: translateX(-100px);
+      }
+      to {
+        transform: translateX(100vw);
+      }
+    }
+    .star {
+      position: absolute;
+      width: 20px; /* Small stars */
+    }
+    #feedButton {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: orange;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="aquarium" id="aquarium"></div>
+  <button id="feedButton">Feed the Fish</button>
+
+  <script>
+    const aquarium = document.getElementById("aquarium");
+    const feedButton = document.getElementById("feedButton");
+
+    // Function to create small stars automatically
+    function createStar() {
+      const star = document.createElement("img");
+      star.src = "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"; // Small star icon
+      star.classList.add("star");
+      star.style.left = Math.random() * 90 + "vw";
+      star.style.top = Math.random() * 80 + "vh";
+      aquarium.appendChild(star);
+      setTimeout(() => star.remove(), 5000);
+    }
+
+    // Function to create fish logos (only when feed button is clicked)
+    function createFishLogo() {
+      const fishLogo = document.createElement("img");
+      // Replace "fish.png" with the correct relative path or URL for your fish logo image
+      fishLogo.src = "fish.png";
+      fishLogo.classList.add("fish"); // Use the same class as moving fish
+      const fishY = Math.random() * 80 + "vh";
+      fishLogo.style.top = fishY;
+      fishLogo.style.animationDuration = Math.random() * 3 + 4 + "s";
+      
+      aquarium.appendChild(fishLogo);
+      setTimeout(() => fishLogo.remove(), 6000);
+    }
+
+    // Check for collision between a fish and a star
+    function checkCollision(fish, star) {
+      const fishRect = fish.getBoundingClientRect();
+      const starRect = star.getBoundingClientRect();
+      return !(
+        fishRect.right < starRect.left ||
+        fishRect.left > starRect.right ||
+        fishRect.bottom < starRect.top ||
+        fishRect.top > starRect.bottom
+      );
+    }
+
+    // Continuously check for collisions and remove stars if "eaten"
+    function moveFish() {
+      const fishes = document.querySelectorAll(".fish");
+      const stars = document.querySelectorAll(".star");
+      
+      fishes.forEach(fish => {
+        stars.forEach(star => {
+          if (checkCollision(fish, star)) {
+            star.remove();
+          }
+        });
+      });
+    }
+
+    // Automatically create small stars every 2 seconds
+    setInterval(createStar, 2000);
+
+    // Continuously check for collision (every 100ms)
+    setInterval(moveFish, 100);
+
+    // When "Feed the Fish" button is clicked, create 3 fish logos
+    feedButton.addEventListener("click", () => {
+      for (let i = 0; i < 3; i++) {
+        createFishLogo();
+      }
+    });
+  </script>
+</body>
+</html>
